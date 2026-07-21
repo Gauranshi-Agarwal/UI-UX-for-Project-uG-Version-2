@@ -3442,3 +3442,220 @@ img.upgrad-launcher-image {
     padding-top: 0 !important;
   }
 }
+
+/* =====================================================
+   TARGETED CAROUSEL TITLE â€” SHOW COMPLETE HEADING
+   Removes the two-line clamp and browser ellipsis from
+   Download Brochure and Connect to AC carousel titles.
+   KEEP THIS BLOCK AT THE ABSOLUTE END OF THE CSS FILE.
+   ===================================================== */
+
+.upgrad-download-brochure-carousel-root
+.upgrad-download-brochure-carousel-card
+.title {
+  display: block !important;
+
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+
+  overflow: visible !important;
+  text-overflow: clip !important;
+
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+
+  -webkit-box-orient: initial !important;
+  -webkit-line-clamp: unset !important;
+  line-clamp: unset !important;
+}
+
+/* Ensure the text area itself never clips a longer title. */
+.upgrad-download-brochure-carousel-root
+.upgrad-download-brochure-carousel-card
+.engt-card-info {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* =====================================================
+   TARGETED CAROUSEL â€” LONG TITLE LAYOUT FIX
+   Prevents full course titles and metadata from overlapping
+   the action buttons. Applies only to carousels selected by
+   the JavaScript because they contain "Download Brochure"
+   or "Connect to AC".
+   KEEP THIS BLOCK AT THE ABSOLUTE END OF THE CSS FILE.
+   ===================================================== */
+
+/* Each card uses its real content height instead of a fixed height. */
+.upgrad-download-brochure-carousel-root
+.upgrad-download-brochure-carousel-track {
+  align-items: flex-start !important;
+}
+
+.upgrad-download-brochure-carousel-root
+.upgrad-download-brochure-carousel-card {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  align-self: flex-start !important;
+  overflow: hidden !important;
+}
+
+/* Keep the image, text and buttons in normal document flow. */
+.upgrad-download-brochure-carousel-root
+.upgrad-download-brochure-carousel-card
+.engt-card-clickable {
+  display: flex !important;
+  flex: 0 0 auto !important;
+  flex-direction: column !important;
+
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+
+  overflow: visible !important;
+}
+
+.upgrad-download-brochure-carousel-root
+.upgrad-download-brochure-carousel-card
+.engt-card-info {
+  position: static !important;
+  flex: 0 0 auto !important;
+
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+
+  overflow: visible !important;
+}
+
+/* Show every title line without an ellipsis or clipping. */
+.upgrad-download-brochure-carousel-root
+.upgrad-download-brochure-carousel-card
+.title {
+  position: static !important;
+  display: block !important;
+
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+
+  margin-bottom: 0 !important;
+
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: normal !important;
+
+  -webkit-box-orient: initial !important;
+  -webkit-line-clamp: unset !important;
+  line-clamp: unset !important;
+}
+
+/* Metadata stays directly below the complete title. */
+.upgrad-download-brochure-carousel-root
+.upgrad-download-brochure-carousel-card
+.description {
+  position: static !important;
+  inset: auto !important;
+
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+
+  margin: 8px 0 0 !important;
+  overflow: visible !important;
+  transform: none !important;
+}
+
+/* Buttons follow the title and metadata instead of overlapping them. */
+.upgrad-download-brochure-carousel-root
+.upgrad-download-brochure-carousel-card
+.engt-card-btns {
+  position: static !important;
+  inset: auto !important;
+  flex: 0 0 auto !important;
+
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+
+  margin: 12px 0 0 !important;
+  padding: 0 12px 13px !important;
+
+  transform: none !important;
+  overflow: visible !important;
+}
+
+@media only screen and (max-width: 600px) {
+  .upgrad-download-brochure-carousel-root
+  .upgrad-download-brochure-carousel-card
+  .description {
+    margin-top: 7px !important;
+  }
+
+  .upgrad-download-brochure-carousel-root
+  .upgrad-download-brochure-carousel-card
+  .engt-card-btns {
+    margin-top: 10px !important;
+    padding: 0 11px 12px !important;
+  }
+}
+/* =====================================================
+   DESKTOP CHATBOT BOX — 3:4 ASPECT RATIO
+   420px wide × 560px high
+
+   KEEP AT THE ABSOLUTE END OF THE CSS FILE
+   ===================================================== */
+
+@media only screen and (min-width: 769px) {
+
+  #engtWrapper {
+    width: 420px !important;
+    min-width: 420px !important;
+    max-width: 420px !important;
+
+    height: 560px !important;
+    min-height: 560px !important;
+    max-height: 560px !important;
+
+    aspect-ratio: 3 / 4 !important;
+
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  /* Make the complete chatbot follow the wrapper size */
+  #engt-popup,
+  #engtChatScreen,
+  #engtChatWrapper,
+  .engt-popup,
+  .engt-chat-screen,
+  .engt-chat-window,
+  .engt-chatbot-window,
+  .engt-chatbot-container,
+  .engt-common-chat-window,
+  .engt-bot-container,
+  .engt-pages,
+  .engt-chat-container {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+
+    box-sizing: border-box !important;
+  }
+}
