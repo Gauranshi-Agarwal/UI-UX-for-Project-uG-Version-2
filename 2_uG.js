@@ -1903,68 +1903,7 @@
     initialize();
   }
 })();
-/* =====================================================
-   EXACTLY 3 SMO BUTTONS — SPECIAL LAYOUT CLASS
-   Paste at the absolute end of the JS file
-   ===================================================== */
 
-(function () {
-  "use strict";
-
-  const GRID_SELECTOR = ".upgrad-smo-grid";
-  const BUTTON_SELECTOR = ":scope > .upgrad-smo-button";
-  const THREE_BUTTON_CLASS = "upgrad-smo-layout-three";
-
-  let updateScheduled = false;
-
-  function updateThreeButtonLayouts() {
-    updateScheduled = false;
-
-    document.querySelectorAll(GRID_SELECTOR).forEach(function (grid) {
-      const buttons = Array.from(
-        grid.querySelectorAll(BUTTON_SELECTOR)
-      );
-
-      grid.classList.toggle(
-        THREE_BUTTON_CLASS,
-        buttons.length === 3
-      );
-    });
-  }
-
-  function scheduleUpdate() {
-    if (updateScheduled) {
-      return;
-    }
-
-    updateScheduled = true;
-
-    window.requestAnimationFrame(function () {
-      updateThreeButtonLayouts();
-    });
-  }
-
-  function initialize() {
-    updateThreeButtonLayouts();
-
-    const observer = new MutationObserver(scheduleUpdate);
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener(
-      "DOMContentLoaded",
-      initialize,
-      { once: true }
-    );
-  } else {
-    initialize();
-  }
-})();
 /* =====================================================
    EXACTLY 2 SMO BUTTONS
 
