@@ -2434,3 +2434,110 @@
 })();
 
 /* ~ UPGRAD TARGETED CAROUSEL INTEGRATION */
+/* =====================================================
+   CAROUSEL DATE FORMAT
+   2026-09-30 → Sep 30, 2026
+   Applies only to customized carousel cards
+   ===================================================== */
+
+(function () {
+  "use strict";
+
+  const CAROUSEL_SELECTOR =
+    ".upgrad-download-brochure-carousel-root";
+
+  const ISO_DATE_PATTERN =
+    /\b(\d{4})-(\d{2})-(\d{2})\b/g;
+
+  const MONTHS = [
+    "Jan", "Feb", "Mar", "Apr",
+    "May", "Jun", "Jul", "Aug",
+    "Sep", "Oct", "Nov", "Dec"
+  ];
+
+  let updateScheduled = false;
+
+  function formatDate(year, month, day) {
+    const monthIndex = Number(month) - 1;
+    const monthName = MONTHS[monthIndex];
+
+    if (!monthName) {
+      return `${year}-${month}-${day}`;
+    }
+
+    return `${monthName} ${Number(day)}, ${year}`;
+  }
+
+  function formatTextNode(textNode) {
+    if (!textNode.nodeValue) return;
+
+    textNode.nodeValue = textNode.nodeValue.replace(
+      ISO_DATE_PATTERN,
+      function (originalDate, year, month, day) {
+        return formatDate(year, month, day);
+      }
+    );
+  }
+
+  function formatCarouselDates(root = document) {
+    const carousels = [];
+
+    if (root.matches?.(CAROUSEL_SELECTOR)) {
+      carousels.push(root);
+    }
+
+    root
+      .querySelectorAll?.(CAROUSEL_SELECTOR)
+      .forEach(function (carousel) {
+        carousels.push(carousel);
+      });
+
+    carousels.forEach(function (carousel) {
+      const walker = document.createTreeWalker(
+        carousel,
+        NodeFilter.SHOW_TEXT
+      );
+
+      let textNode;
+
+      while ((textNode = walker.nextNode())) {
+        formatTextNode(textNode);
+      }
+    });
+  }
+
+  function scheduleDateFormatting() {
+    if (updateScheduled) return;
+
+    updateScheduled = true;
+
+    window.requestAnimationFrame(function () {
+      updateScheduled = false;
+      formatCarouselDates();
+    });
+  }
+
+  const observer = new MutationObserver(
+    scheduleDateFormatting
+  );
+
+  function initialize() {
+    formatCarouselDates();
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      characterData: true
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initialize,
+      { once: true }
+    );
+  } else {
+    initialize();
+  }
+})();
