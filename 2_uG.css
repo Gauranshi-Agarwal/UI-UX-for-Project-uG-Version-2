@@ -3659,3 +3659,378 @@ img.upgrad-launcher-image {
     box-sizing: border-box !important;
   }
 }
+/* =====================================================
+   CAROUSEL CARDS — SAME HEIGHT WITHIN EACH MESSAGE
+   Every card takes the height of the tallest card
+   in its own carousel only.
+   KEEP AT THE ABSOLUTE END OF THE CSS FILE.
+   ===================================================== */
+
+/* Stretch cards to the tallest card inside this carousel */
+.upgrad-download-brochure-carousel-root
+.upgrad-download-brochure-carousel-track {
+  align-items: stretch !important;
+}
+
+/* Every card in the same carousel receives equal height */
+.upgrad-download-brochure-carousel-root
+.upgrad-download-brochure-carousel-card {
+  display: flex !important;
+  flex-direction: column !important;
+
+  align-self: stretch !important;
+
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+
+/* Allow the internal card content to fill the equal card height */
+.upgrad-download-brochure-carousel-root
+.upgrad-download-brochure-carousel-card
+.engt-card-clickable {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+}
+
+/* Keep buttons aligned at the bottom of every card */
+.upgrad-download-brochure-carousel-root
+.upgrad-download-brochure-carousel-card
+.engt-card-btns {
+  margin-top: auto !important;
+}
+/* =====================================================
+   APPLY NOW + CONNECT TO AC CAROUSEL
+   SAME HEIGHT AS THE TALLEST CARD IN THAT MESSAGE
+   KEEP AT THE ABSOLUTE END OF THE CSS FILE
+   ===================================================== */
+
+/* The tallest card determines the height of this carousel row */
+.upgrad-download-brochure-carousel-root.upgrad-connect-ac-carousel-root
+.upgrad-download-brochure-carousel-track {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+}
+
+/* Stretch every card to the tallest card in this carousel */
+.upgrad-download-brochure-carousel-root.upgrad-connect-ac-carousel-root
+.upgrad-download-brochure-carousel-track
+.upgrad-download-brochure-carousel-card {
+  display: flex !important;
+  flex-direction: column !important;
+
+  align-self: stretch !important;
+
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+
+/* Make the inside of each card fill the equal card height */
+.upgrad-download-brochure-carousel-root.upgrad-connect-ac-carousel-root
+.upgrad-download-brochure-carousel-card
+.engt-card-clickable {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+
+/* Keep title and description in their natural position */
+.upgrad-download-brochure-carousel-root.upgrad-connect-ac-carousel-root
+.upgrad-download-brochure-carousel-card
+.engt-card-info {
+  flex: 0 0 auto !important;
+}
+
+/* Keep Apply Now and Connect to AC aligned at the bottom */
+.upgrad-download-brochure-carousel-root.upgrad-connect-ac-carousel-root
+.upgrad-download-brochure-carousel-card
+.engt-card-btns {
+  margin-top: auto !important;
+  margin-bottom: 0 !important;
+}
+
+/* Mobile */
+@media only screen and (max-width: 600px) {
+  .upgrad-download-brochure-carousel-root.upgrad-connect-ac-carousel-root
+  .upgrad-download-brochure-carousel-track {
+    align-items: stretch !important;
+  }
+
+  .upgrad-download-brochure-carousel-root.upgrad-connect-ac-carousel-root
+  .upgrad-download-brochure-carousel-card {
+    align-self: stretch !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+
+  .upgrad-download-brochure-carousel-root.upgrad-connect-ac-carousel-root
+  .upgrad-download-brochure-carousel-card
+  .engt-card-clickable {
+    flex: 1 1 auto !important;
+    height: 100% !important;
+  }
+
+  .upgrad-download-brochure-carousel-root.upgrad-connect-ac-carousel-root
+  .upgrad-download-brochure-carousel-card
+  .engt-card-btns {
+    margin-top: auto !important;
+  }
+}
+/* =====================================================
+   BOT MESSAGE TEXT — USE FULL WHITE BUBBLE WIDTH
+   KEEP AT THE ABSOLUTE END OF THE CSS FILE
+   ===================================================== */
+
+/* Control the width only through the outer white bubble */
+.engt-msg-container.upgrad-bot-message
+.engt-msg-bot:not(:has(form)):not(:has(.engt-form)):not(:has(.engt-form-container)) {
+  display: inline-block !important;
+
+  width: fit-content !important;
+  min-width: 0 !important;
+  max-width: 78% !important;
+
+  margin-right: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* Let the text use the complete internal width of the bubble */
+.engt-msg-container.upgrad-bot-message
+.engt-msg-bot:not(:has(form)):not(:has(.engt-form)):not(:has(.engt-form-container))
+.engt-msg-text {
+  display: block !important;
+
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+
+  box-sizing: border-box !important;
+}
+
+/* Remove width restrictions from paragraphs or divs inside the text */
+.engt-msg-container.upgrad-bot-message
+.engt-msg-bot
+.engt-msg-text > div,
+.engt-msg-container.upgrad-bot-message
+.engt-msg-bot
+.engt-msg-text > p,
+.engt-msg-container.upgrad-bot-message
+.engt-msg-bot
+.engt-msg-text > span {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+/* Mobile */
+@media only screen and (max-width: 600px) {
+  .engt-msg-container.upgrad-bot-message
+  .engt-msg-bot:not(:has(form)):not(:has(.engt-form)):not(:has(.engt-form-container)) {
+    max-width: 82% !important;
+  }
+
+  .engt-msg-container.upgrad-bot-message
+  .engt-msg-bot:not(:has(form)):not(:has(.engt-form)):not(:has(.engt-form-container))
+  .engt-msg-text {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+/* =====================================================
+   SMO PROMPT — MATCH NORMAL BOT MESSAGE STYLE
+   KEEP AT THE ABSOLUTE END OF THE CSS FILE
+   ===================================================== */
+
+.engt-msg-container.upgrad-smo-host
+.upgrad-smo-prompt {
+  display: block !important;
+
+  width: fit-content !important;
+  min-width: 0 !important;
+  max-width: 78% !important;
+
+  margin: 0 0 16px 0 !important;
+  padding: 13px 16px !important;
+
+  background: #ffffff !important;
+  color: #1d1d1f !important;
+
+  border: 1px solid #e2e2e2 !important;
+  border-radius: 14px !important;
+  box-shadow: none !important;
+
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 1.45 !important;
+
+  text-align: left !important;
+  white-space: pre-wrap !important;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+
+  box-sizing: border-box !important;
+}
+
+/* Remove unwanted spacing from inner paragraphs */
+.engt-msg-container.upgrad-smo-host
+.upgrad-smo-prompt > div,
+.engt-msg-container.upgrad-smo-host
+.upgrad-smo-prompt > p {
+  width: 100% !important;
+  max-width: 100% !important;
+
+  margin-top: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* Keep the final line from adding extra bottom space */
+.engt-msg-container.upgrad-smo-host
+.upgrad-smo-prompt > div:last-child,
+.engt-msg-container.upgrad-smo-host
+.upgrad-smo-prompt > p:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Mobile */
+@media only screen and (max-width: 600px) {
+  .engt-msg-container.upgrad-smo-host
+  .upgrad-smo-prompt {
+    max-width: 82% !important;
+
+    padding: 12px 15px !important;
+    border-radius: 14px !important;
+  }
+}
+/* =====================================================
+   FINAL BOT + SMO MESSAGE BOX — EXACT SAME WIDTH
+   KEEP AT THE ABSOLUTE END OF THE CSS FILE
+   ===================================================== */
+
+/* Both normal and SMO message wrappers fill the area beside avatar */
+.engt-msg-container.upgrad-bot-message
+> .engt-msg-bot,
+.engt-msg-container.upgrad-smo-host
+> .engt-msg-smo.upgrad-smo-processed {
+  flex: 1 1 0 !important;
+
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+
+  box-sizing: border-box !important;
+}
+
+/* SMO shell fills the same available area */
+.engt-msg-container.upgrad-smo-host
+.engt-msg-smo.upgrad-smo-processed
+> .upgrad-smo-shell {
+  display: block !important;
+
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  box-sizing: border-box !important;
+}
+
+/* Normal bot box and SMO prompt get exactly the same width */
+.engt-msg-container.upgrad-bot-message
+> .engt-msg-bot
+> .engt-msg-text,
+.engt-msg-container.upgrad-smo-host
+.engt-msg-smo.upgrad-smo-processed
+.upgrad-smo-shell
+> .upgrad-smo-prompt {
+  display: block !important;
+
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+
+  box-sizing: border-box !important;
+}
+
+/* Keep SMO prompt looking like a regular bot message */
+.engt-msg-container.upgrad-smo-host
+.engt-msg-smo.upgrad-smo-processed
+.upgrad-smo-shell
+> .upgrad-smo-prompt {
+  margin-bottom: 16px !important;
+
+  padding: 13px 16px !important;
+
+  background: #ffffff !important;
+  color: #1d1d1f !important;
+
+  border: 1px solid #e2e2e2 !important;
+  border-radius: 14px !important;
+
+  white-space: pre-wrap !important;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+}
+
+/* Do not change the SMO button layout */
+.engt-msg-container.upgrad-smo-host
+.upgrad-smo-grid {
+  min-width: 0 !important;
+}
+
+/* Mobile */
+@media only screen and (max-width: 600px) {
+  .engt-msg-container.upgrad-bot-message
+  > .engt-msg-bot
+  > .engt-msg-text,
+  .engt-msg-container.upgrad-smo-host
+  .engt-msg-smo.upgrad-smo-processed
+  .upgrad-smo-shell
+  > .upgrad-smo-prompt {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+/* =====================================================
+   SMO MESSAGE — LIGHTER OUTER BORDER
+   KEEP AT THE ABSOLUTE END OF THE CSS FILE
+   ===================================================== */
+
+.engt-msg-container.upgrad-smo-host
+.engt-msg-smo.upgrad-smo-processed
+.upgrad-smo-shell
+> .upgrad-smo-prompt {
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: none !important;
+}
