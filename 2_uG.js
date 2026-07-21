@@ -1500,284 +1500,153 @@
 })();
 
 /* =====================================================
-   SMO LAYOUT BY ACTUAL BUTTON COUNT
-   1–4 buttons = vertical
-   5+ buttons  = two columns
+   SMO LAYOUT BY BUTTON TEXT AND BUTTON COUNT
+
+   Every button contains "year" = horizontal row
+   Otherwise:
+   1–5 buttons = vertical
+   6+ buttons  = two columns
    ===================================================== */
+
 (function () {
-    const GRID_SELECTOR = '.upgrad-smo-grid';
-    const BUTTON_SELECTOR = '.upgrad-smo-button';
-    function updateSmoLayouts(root = document) {
-        const grids = [];
-        if (root.matches?.(GRID_SELECTOR)) {
-            grids.push(root);
+  "use strict";
+
+  const GRID_SELECTOR = ".upgrad-smo-grid";
+  const BUTTON_SELECTOR = ".upgrad-smo-button";
+
+  let updateTimer = null;
+
+  function getButtonText(button) {
+    const label = button.querySelector(".upgrad-smo-label");
+
+    return String(
+      label?.textContent ||
+      button.getAttribute("aria-label") ||
+      button.textContent ||
+      ""
+    )
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase();
+  }
+
+  function updateSmoLayouts(root = document) {
+    const grids = [];
+
+    if (root.matches?.(GRID_SELECTOR)) {
+      grids.push(root);
+    }
+
+    root.querySelectorAll?.(GRID_SELECTOR).forEach(function (grid) {
+      grids.push(grid);
+    });
+
+    grids.forEach(function (grid) {
+      const buttons = Array.from(
+        grid.querySelectorAll(
+          ":scope > " + BUTTON_SELECTOR
+        )
+      ).filter(function (button) {
+        return (
+          !button.hidden &&
+          window.getComputedStyle(button).display !== "none"
+        );
+      });
+
+      if (!buttons.length) {
+        return;
+      }
+
+      /*
+       * This also detects:
+       * 1 Year
+       * 2 Years
+       * 3-year program
+       * Years of experience
+       */
+      const allButtonsContainYear = buttons.every(
+        function (button) {
+          return getButtonText(button).includes("year");
         }
-        root.querySelectorAll?.(GRID_SELECTOR).forEach((grid) => {
-            grids.push(grid);
-        });
-        grids.forEach((grid) => {
-            const buttons = Array.from(grid.querySelectorAll(`:scope > ${BUTTON_SELECTOR}`)).filter((button) => {
-                return !button.hidden && getComputedStyle(button).display !== 'none';
-            });
-            grid.classList.remove('upgrad-smo-layout-vertical', 'upgrad-smo-layout-grid');
-            if (buttons.length > 0 && buttons.length < 6) {
-                grid.classList.add('upgrad-smo-layout-vertical');
-            }
-            else if (buttons.length >= 6) {
-                grid.classList.add('upgrad-smo-layout-grid');
-            }
-        });
-    }
-    function scheduleUpdate() {
-        clearTimeout(window.upgradSmoLayoutTimeout);
-        window.upgradSmoLayoutTimeout = setTimeout(() => {
-            updateSmoLayouts();
-        }, 80);
-    }
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', scheduleUpdate);
-    }
-    else {
-        scheduleUpdate();
-    }
-    const observer = new MutationObserver(scheduleUpdate);
+      );
+
+      grid.classList.remove(
+        "upgrad-smo-layout-vertical",
+        "upgrad-smo-layout-grid",
+        "upgrad-smo-layout-years"
+      );
+
+      if (allButtonsContainYear) {
+        grid.classList.add("upgrad-smo-layout-years");
+        return;
+      }
+
+      if (buttons.length < 6) {
+        grid.classList.add(
+          "upgrad-smo-layout-vertical"
+        );
+      } else {
+        grid.classList.add(
+          "upgrad-smo-layout-grid"
+        );
+      }
+    });
+  }
+
+  function scheduleUpdate() {
+    window.clearTimeout(updateTimer);
+
+    updateTimer = window.setTimeout(function () {
+      updateSmoLayouts(document);
+    }, 120);
+  }
+
+  function initialize() {
+    scheduleUpdate();
+
+    const observer = new MutationObserver(
+      function (mutations) {
+        const hasSmoChange = mutations.some(
+          function (mutation) {
+            const target = mutation.target;
+
+            return (
+              target instanceof Element &&
+              Boolean(
+                target.matches?.(GRID_SELECTOR) ||
+                target.closest?.(GRID_SELECTOR) ||
+                target.querySelector?.(GRID_SELECTOR)
+              )
+            );
+          }
+        );
+
+        if (hasSmoChange) {
+          scheduleUpdate();
+        }
+      }
+    );
+
     observer.observe(document.body, {
-        childList: true,
-        subtree: true
+      childList: true,
+      subtree: true,
+      characterData: true
     });
-    window.addEventListener('load', scheduleUpdate);
+
+    window.addEventListener("load", scheduleUpdate);
+    window.addEventListener("resize", scheduleUpdate);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initialize,
+      { once: true }
+    );
+  } else {
+    initialize();
+  }
 })();
-
-/* =====================================================
-   UPGRAD TARGETED CAROUSEL INTEGRATION
-   Applies the custom carousel design when a carousel contains
-   either a "Download Brochure" button or an "Connect to AC" button.
-   Every other Engati carousel remains completely default.
-   Titles, descriptions, button labels, and button actions are
-   preserved exactly as supplied by Engati.
-   ===================================================== */
-(function () {
-    "use strict";
-    const TRACK_SELECTOR = [
-        ".engt-carousel-vertical_continuous_scroll_seamless",
-        ".engt-carousel-vertical-continuous-scroll-seamless"
-    ].join(",");
-    const CARD_SELECTOR = ".engt-card.engt-card-thin";
-    const ROOT_SELECTOR = [
-        ".engt-msg-carousel",
-        ".engt-carousel-wrapper",
-        ".engt-carousel-container",
-        ".engt-carousel-vertical",
-        "[data-testid*='carousel']"
-    ].join(",");
-    const ACTION_SELECTOR = [
-        ".engt-card-btns button",
-        ".engt-card-btns .engt-button",
-        ".engt-card-btns .engt-button-base",
-        ".engt-card-btns a",
-        ".engt-card-btns [role='button']"
-    ].join(",");
-    const TARGET_BUTTON_TEXTS = [
-        "download brochure",
-        "connect to ac"
-    ];
-    const ROOT_CLASS = "upgrad-download-brochure-carousel-root";
-    const TRACK_CLASS = "upgrad-download-brochure-carousel-track";
-    const CARD_CLASS = "upgrad-download-brochure-carousel-card";
-    let processingScheduled = false;
-    function normalizeText(value) {
-        return String(value || "")
-            .replace(/\s+/g, " ")
-            .trim()
-            .toLowerCase();
-    }
-    function getActionText(element) {
-        if (!element)
-            return "";
-        return normalizeText(element.innerText ||
-            element.textContent ||
-            element.getAttribute("aria-label") ||
-            element.getAttribute("title") ||
-            "");
-    }
-    function findCarouselRoot(track) {
-        if (!track || !track.parentElement)
-            return null;
-        return (track.parentElement.closest(ROOT_SELECTOR) ||
-            track.parentElement);
-    }
-    function getCards(track) {
-        return Array.from(track.querySelectorAll(CARD_SELECTOR));
-    }
-    function containsTargetButton(cards) {
-        return cards.some(function (card) {
-            return Array.from(card.querySelectorAll(ACTION_SELECTOR)).some(function (action) {
-                const actionText = getActionText(action);
-
-                return TARGET_BUTTON_TEXTS.some(function (targetText) {
-                    return actionText.includes(targetText);
-                });
-            });
-        });
-    }
-    function removeCustomClasses(root, track, cards) {
-        if (root) {
-            root.classList.remove(ROOT_CLASS);
-            root.classList.remove("upgrad-carousel-root");
-        }
-        if (track) {
-            track.classList.remove(TRACK_CLASS);
-            track.classList.remove("upgrad-carousel-track");
-        }
-        cards.forEach(function (card) {
-            card.classList.remove(CARD_CLASS);
-            card.classList.remove("upgrad-carousel-card");
-        });
-    }
-    function getOrCreateProgress(root) {
-        const nativeShell = root.querySelector(".engt-carousel-inline-dot");
-        const nativeTrack = root.querySelector(".engt-carousel-dots");
-        if (nativeTrack) {
-            if (nativeShell) {
-                nativeShell.classList.add("upgrad-carousel-progress-shell");
-            }
-            nativeTrack.classList.add("upgrad-carousel-progress-track");
-            nativeTrack.setAttribute("aria-hidden", "true");
-            return nativeTrack;
-        }
-        let generatedProgress = root.querySelector(".upgrad-carousel-generated-progress");
-        if (!generatedProgress) {
-            generatedProgress = document.createElement("div");
-            generatedProgress.className =
-                "upgrad-carousel-progress-shell " +
-                    "upgrad-carousel-generated-progress";
-            generatedProgress.setAttribute("aria-hidden", "true");
-            const progressTrack = document.createElement("div");
-            progressTrack.className =
-                "upgrad-carousel-progress-track";
-            generatedProgress.appendChild(progressTrack);
-            root.appendChild(generatedProgress);
-        }
-        return generatedProgress.querySelector(".upgrad-carousel-progress-track");
-    }
-    function updateCarouselProgress(root, track) {
-        if (!root || !track || !track.isConnected)
-            return;
-        const visibleWidth = Math.max(track.clientWidth, 1);
-        const totalWidth = Math.max(track.scrollWidth, visibleWidth);
-        const maxScroll = Math.max(totalWidth - visibleWidth, 0);
-        const visiblePercent = Math.min(100, Math.max(18, (visibleWidth / totalWidth) * 100));
-        const rawProgress = maxScroll > 0
-            ? Math.min(1, Math.max(0, track.scrollLeft / maxScroll))
-            : 0;
-        const availablePercent = Math.max(0, 100 - visiblePercent);
-        const thumbLeft = rawProgress * availablePercent;
-        root.style.setProperty("--upgrad-carousel-thumb-width", visiblePercent.toFixed(3) + "%");
-        root.style.setProperty("--upgrad-carousel-thumb-left", thumbLeft.toFixed(3) + "%");
-    }
-    function bindTrack(root, track) {
-        if (track.dataset.upgradDownloadBrochureCarouselBound ===
-            "true") {
-            updateCarouselProgress(root, track);
-            return;
-        }
-        track.dataset.upgradDownloadBrochureCarouselBound =
-            "true";
-        track.addEventListener("scroll", function () {
-            window.requestAnimationFrame(function () {
-                updateCarouselProgress(root, track);
-            });
-        }, { passive: true });
-        if (typeof ResizeObserver === "function") {
-            const resizeObserver = new ResizeObserver(function () {
-                updateCarouselProgress(root, track);
-            });
-            resizeObserver.observe(track);
-            track.__upgradDownloadBrochureResizeObserver =
-                resizeObserver;
-        }
-    }
-    function formatCarousel(track) {
-        if (!(track instanceof HTMLElement))
-            return;
-        const cards = getCards(track);
-        if (!cards.length)
-            return;
-        const root = findCarouselRoot(track);
-        if (!root)
-            return;
-        if (!containsTargetButton(cards)) {
-            removeCustomClasses(root, track, cards);
-            return;
-        }
-        root.classList.remove("upgrad-carousel-root");
-        track.classList.remove("upgrad-carousel-track");
-        root.classList.add(ROOT_CLASS);
-        track.classList.add(TRACK_CLASS);
-        cards.forEach(function (card) {
-            card.classList.remove("upgrad-carousel-card");
-            card.classList.add(CARD_CLASS);
-            card.querySelectorAll("img").forEach(function (image) {
-                image.setAttribute("draggable", "false");
-            });
-        });
-        getOrCreateProgress(root);
-        bindTrack(root, track);
-        updateCarouselProgress(root, track);
-    }
-    function processAllCarousels() {
-        processingScheduled = false;
-        document
-            .querySelectorAll(TRACK_SELECTOR)
-            .forEach(formatCarousel);
-    }
-    function scheduleCarouselProcessing() {
-        if (processingScheduled)
-            return;
-        processingScheduled = true;
-        window.requestAnimationFrame(processAllCarousels);
-    }
-    const observer = new MutationObserver(function (mutations) {
-        const hasCarouselChanges = mutations.some(function (mutation) {
-            return Array.from(mutation.addedNodes).some(function (node) {
-                if (node.nodeType !== Node.ELEMENT_NODE) {
-                    return false;
-                }
-                return Boolean(node.matches?.(TRACK_SELECTOR +
-                    ", " +
-                    CARD_SELECTOR +
-                    ", " +
-                    ACTION_SELECTOR) ||
-                    node.querySelector?.(TRACK_SELECTOR +
-                        ", " +
-                        CARD_SELECTOR +
-                        ", " +
-                        ACTION_SELECTOR) ||
-                    node.closest?.(TRACK_SELECTOR));
-            });
-        });
-        if (hasCarouselChanges) {
-            scheduleCarouselProcessing();
-        }
-    });
-    function initializeCarouselIntegration() {
-        processAllCarousels();
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
-        window.addEventListener("resize", scheduleCarouselProcessing, { passive: true });
-    }
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", initializeCarouselIntegration, { once: true });
-    }
-    else {
-        initializeCarouselIntegration();
-    }
-})();
-
-/* ~ UPGRAD TARGETED CAROUSEL INTEGRATION */
-
 /* =====================================================
    AUTO-EXPAND BOT MESSAGES — REMOVE READ MORE CLICK
    ===================================================== */
@@ -1945,3 +1814,684 @@
     initialize();
   }
 })();
+/* =====================================================
+   SMO BUTTONS — HORIZONTAL WHEN ALL CONTAIN "YEAR/YEARS"
+   Paste at the absolute end of the JavaScript file
+   ===================================================== */
+
+(function () {
+  "use strict";
+
+  const GRID_SELECTOR = ".upgrad-smo-grid";
+  const BUTTON_SELECTOR = ":scope > .upgrad-smo-button";
+  const HORIZONTAL_CLASS = "upgrad-smo-all-years-horizontal";
+
+  let updateTimer = null;
+
+  function getButtonText(button) {
+    const label = button.querySelector(".upgrad-smo-label");
+
+    return String(
+      label?.textContent ||
+      button.getAttribute("aria-label") ||
+      button.textContent ||
+      ""
+    )
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase();
+  }
+
+  function updateYearButtonLayouts() {
+    document.querySelectorAll(GRID_SELECTOR).forEach(function (grid) {
+      const buttons = Array.from(
+        grid.querySelectorAll(BUTTON_SELECTOR)
+      ).filter(function (button) {
+        return (
+          !button.hidden &&
+          window.getComputedStyle(button).display !== "none"
+        );
+      });
+
+      /*
+       * True only when:
+       * 1. At least two buttons are present.
+       * 2. Every button contains "year" or "years".
+       */
+      const allButtonsContainYears =
+        buttons.length >= 2 &&
+        buttons.every(function (button) {
+          return /\byears?\b/i.test(getButtonText(button));
+        });
+
+      grid.classList.toggle(
+        HORIZONTAL_CLASS,
+        allButtonsContainYears
+      );
+    });
+  }
+
+  function scheduleUpdate() {
+    window.clearTimeout(updateTimer);
+
+    updateTimer = window.setTimeout(function () {
+      updateYearButtonLayouts();
+    }, 100);
+  }
+
+  function initialize() {
+    updateYearButtonLayouts();
+
+    const observer = new MutationObserver(scheduleUpdate);
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      characterData: true
+    });
+
+    window.addEventListener("resize", scheduleUpdate);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initialize,
+      { once: true }
+    );
+  } else {
+    initialize();
+  }
+})();
+/* =====================================================
+   EXACTLY 3 SMO BUTTONS — SPECIAL LAYOUT CLASS
+   Paste at the absolute end of the JS file
+   ===================================================== */
+
+(function () {
+  "use strict";
+
+  const GRID_SELECTOR = ".upgrad-smo-grid";
+  const BUTTON_SELECTOR = ":scope > .upgrad-smo-button";
+  const THREE_BUTTON_CLASS = "upgrad-smo-layout-three";
+
+  let updateScheduled = false;
+
+  function updateThreeButtonLayouts() {
+    updateScheduled = false;
+
+    document.querySelectorAll(GRID_SELECTOR).forEach(function (grid) {
+      const buttons = Array.from(
+        grid.querySelectorAll(BUTTON_SELECTOR)
+      );
+
+      grid.classList.toggle(
+        THREE_BUTTON_CLASS,
+        buttons.length === 3
+      );
+    });
+  }
+
+  function scheduleUpdate() {
+    if (updateScheduled) {
+      return;
+    }
+
+    updateScheduled = true;
+
+    window.requestAnimationFrame(function () {
+      updateThreeButtonLayouts();
+    });
+  }
+
+  function initialize() {
+    updateThreeButtonLayouts();
+
+    const observer = new MutationObserver(scheduleUpdate);
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initialize,
+      { once: true }
+    );
+  } else {
+    initialize();
+  }
+})();
+/* =====================================================
+   EXACTLY 2 SMO BUTTONS
+
+   Special pair:
+   - Request a call back
+   - Schedule now
+   Remains vertical.
+
+   Every other 2-button SMO group becomes horizontal.
+   ===================================================== */
+
+(function () {
+  "use strict";
+
+  const GRID_SELECTOR = ".upgrad-smo-grid";
+  const BUTTON_SELECTOR = ":scope > .upgrad-smo-button";
+
+  const HORIZONTAL_CLASS =
+    "upgrad-smo-two-horizontal";
+
+  const SPECIAL_VERTICAL_CLASS =
+    "upgrad-smo-callback-vertical";
+
+  let processingScheduled = false;
+
+  function normalizeText(value) {
+    return String(value || "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase();
+  }
+
+  function getButtonText(button) {
+    const label =
+      button.querySelector(".upgrad-smo-label");
+
+    return normalizeText(
+      label?.textContent ||
+      button.getAttribute("aria-label") ||
+      button.textContent ||
+      ""
+    );
+  }
+
+  function isRequestCallbackButton(text) {
+    return (
+      text.includes("request") &&
+      text.includes("call") &&
+      (
+        text.includes("back") ||
+        text.includes("callback")
+      )
+    );
+  }
+
+  function isScheduleNowButton(text) {
+    return (
+      text.includes("schedule") &&
+      text.includes("now")
+    );
+  }
+
+  function updateTwoButtonLayout(grid) {
+    const buttons = Array.from(
+      grid.querySelectorAll(BUTTON_SELECTOR)
+    );
+
+    grid.classList.remove(
+      HORIZONTAL_CLASS,
+      SPECIAL_VERTICAL_CLASS
+    );
+
+    if (buttons.length !== 2) {
+      return;
+    }
+
+    const labels = buttons.map(getButtonText);
+
+    const containsCallbackButton =
+      labels.some(isRequestCallbackButton);
+
+    const containsScheduleButton =
+      labels.some(isScheduleNowButton);
+
+    const isSpecialCallbackPair =
+      containsCallbackButton &&
+      containsScheduleButton;
+
+    if (isSpecialCallbackPair) {
+      grid.classList.add(
+        SPECIAL_VERTICAL_CLASS
+      );
+    } else {
+      grid.classList.add(
+        HORIZONTAL_CLASS
+      );
+    }
+  }
+
+  function updateAllLayouts() {
+    processingScheduled = false;
+
+    document
+      .querySelectorAll(GRID_SELECTOR)
+      .forEach(updateTwoButtonLayout);
+  }
+
+  function scheduleUpdate() {
+    if (processingScheduled) {
+      return;
+    }
+
+    processingScheduled = true;
+
+    window.requestAnimationFrame(
+      updateAllLayouts
+    );
+  }
+
+  function initialize() {
+    updateAllLayouts();
+
+    const observer = new MutationObserver(
+      scheduleUpdate
+    );
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      characterData: true
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initialize,
+      { once: true }
+    );
+  } else {
+    initialize();
+  }
+})();
+
+/* =====================================================
+   UPGRAD TARGETED CAROUSEL INTEGRATION
+   Applies the custom carousel design only when that carousel
+   contains either a "Download Brochure" button or a
+   "Connect to AC" button.
+
+   Every other Engati carousel remains completely default.
+   Titles, descriptions, button labels, and button actions are
+   preserved exactly as supplied by Engati.
+   ===================================================== */
+
+(function () {
+  "use strict";
+
+  const TRACK_SELECTOR = [
+    ".engt-carousel-vertical_continuous_scroll_seamless",
+    ".engt-carousel-vertical-continuous-scroll-seamless"
+  ].join(",");
+
+  const CARD_SELECTOR = ".engt-card.engt-card-thin";
+
+  const ROOT_SELECTOR = [
+    ".engt-msg-carousel",
+    ".engt-carousel-wrapper",
+    ".engt-carousel-container",
+    ".engt-carousel-vertical",
+    "[data-testid*='carousel']"
+  ].join(",");
+
+  const ACTION_SELECTOR = [
+    ".engt-card-btns button",
+    ".engt-card-btns .engt-button",
+    ".engt-card-btns .engt-button-base",
+    ".engt-card-btns a",
+    ".engt-card-btns [role='button']"
+  ].join(",");
+
+  const TARGET_TEXTS = [
+    "download brochure",
+    "connect to ac"
+  ];
+
+  const CONNECT_AC_TEXT = "connect to ac";
+
+  const ROOT_CLASS =
+    "upgrad-download-brochure-carousel-root";
+
+  const CONNECT_AC_ROOT_CLASS =
+    "upgrad-connect-ac-carousel-root";
+
+  const TRACK_CLASS =
+    "upgrad-download-brochure-carousel-track";
+
+  const CARD_CLASS =
+    "upgrad-download-brochure-carousel-card";
+
+  let processingScheduled = false;
+
+  function normalizeText(value) {
+    return String(value || "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase();
+  }
+
+  function getActionText(element) {
+    if (!element) return "";
+
+    return normalizeText(
+      element.innerText ||
+      element.textContent ||
+      element.getAttribute("aria-label") ||
+      element.getAttribute("title") ||
+      ""
+    );
+  }
+
+  function findCarouselRoot(track) {
+    if (!track || !track.parentElement) return null;
+
+    return (
+      track.parentElement.closest(ROOT_SELECTOR) ||
+      track.parentElement
+    );
+  }
+
+  function getCards(track) {
+    return Array.from(
+      track.querySelectorAll(CARD_SELECTOR)
+    );
+  }
+
+  function getCarouselButtonState(cards) {
+    const state = {
+      hasTargetButton: false,
+      hasConnectToAcButton: false
+    };
+
+    cards.forEach(function (card) {
+      Array.from(
+        card.querySelectorAll(ACTION_SELECTOR)
+      ).forEach(function (action) {
+        const actionText = getActionText(action);
+
+        if (
+          TARGET_TEXTS.some(function (targetText) {
+            return actionText.includes(targetText);
+          })
+        ) {
+          state.hasTargetButton = true;
+        }
+
+        if (actionText.includes(CONNECT_AC_TEXT)) {
+          state.hasConnectToAcButton = true;
+        }
+      });
+    });
+
+    return state;
+  }
+
+  function removeCustomClasses(root, track, cards) {
+    if (root) {
+      root.classList.remove(ROOT_CLASS);
+      root.classList.remove(CONNECT_AC_ROOT_CLASS);
+      root.classList.remove("upgrad-carousel-root");
+    }
+
+    if (track) {
+      track.classList.remove(TRACK_CLASS);
+      track.classList.remove("upgrad-carousel-track");
+    }
+
+    cards.forEach(function (card) {
+      card.classList.remove(CARD_CLASS);
+      card.classList.remove("upgrad-carousel-card");
+    });
+  }
+
+  function getOrCreateProgress(root) {
+    const nativeShell = root.querySelector(
+      ".engt-carousel-inline-dot"
+    );
+
+    const nativeTrack = root.querySelector(
+      ".engt-carousel-dots"
+    );
+
+    if (nativeTrack) {
+      if (nativeShell) {
+        nativeShell.classList.add(
+          "upgrad-carousel-progress-shell"
+        );
+      }
+
+      nativeTrack.classList.add(
+        "upgrad-carousel-progress-track"
+      );
+
+      nativeTrack.setAttribute("aria-hidden", "true");
+      return nativeTrack;
+    }
+
+    let generatedProgress = root.querySelector(
+      ".upgrad-carousel-generated-progress"
+    );
+
+    if (!generatedProgress) {
+      generatedProgress = document.createElement("div");
+      generatedProgress.className =
+        "upgrad-carousel-progress-shell " +
+        "upgrad-carousel-generated-progress";
+
+      generatedProgress.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+
+      const progressTrack = document.createElement("div");
+      progressTrack.className =
+        "upgrad-carousel-progress-track";
+
+      generatedProgress.appendChild(progressTrack);
+      root.appendChild(generatedProgress);
+    }
+
+    return generatedProgress.querySelector(
+      ".upgrad-carousel-progress-track"
+    );
+  }
+
+  function updateCarouselProgress(root, track) {
+    if (!root || !track || !track.isConnected) return;
+
+    const visibleWidth = Math.max(track.clientWidth, 1);
+    const totalWidth = Math.max(
+      track.scrollWidth,
+      visibleWidth
+    );
+
+    const maxScroll = Math.max(
+      totalWidth - visibleWidth,
+      0
+    );
+
+    const visiblePercent = Math.min(
+      100,
+      Math.max(18, (visibleWidth / totalWidth) * 100)
+    );
+
+    const rawProgress = maxScroll > 0
+      ? Math.min(
+          1,
+          Math.max(0, track.scrollLeft / maxScroll)
+        )
+      : 0;
+
+    const availablePercent = Math.max(
+      0,
+      100 - visiblePercent
+    );
+
+    const thumbLeft = rawProgress * availablePercent;
+
+    root.style.setProperty(
+      "--upgrad-carousel-thumb-width",
+      visiblePercent.toFixed(3) + "%"
+    );
+
+    root.style.setProperty(
+      "--upgrad-carousel-thumb-left",
+      thumbLeft.toFixed(3) + "%"
+    );
+  }
+
+  function bindTrack(root, track) {
+    if (
+      track.dataset.upgradDownloadBrochureCarouselBound ===
+      "true"
+    ) {
+      updateCarouselProgress(root, track);
+      return;
+    }
+
+    track.dataset.upgradDownloadBrochureCarouselBound =
+      "true";
+
+    track.addEventListener(
+      "scroll",
+      function () {
+        window.requestAnimationFrame(function () {
+          updateCarouselProgress(root, track);
+        });
+      },
+      { passive: true }
+    );
+
+    if (typeof ResizeObserver === "function") {
+      const resizeObserver = new ResizeObserver(function () {
+        updateCarouselProgress(root, track);
+      });
+
+      resizeObserver.observe(track);
+      track.__upgradDownloadBrochureResizeObserver =
+        resizeObserver;
+    }
+  }
+
+  function formatCarousel(track) {
+    if (!(track instanceof HTMLElement)) return;
+
+    const cards = getCards(track);
+    if (!cards.length) return;
+
+    const root = findCarouselRoot(track);
+    if (!root) return;
+
+    const buttonState = getCarouselButtonState(cards);
+
+    if (!buttonState.hasTargetButton) {
+      removeCustomClasses(root, track, cards);
+      return;
+    }
+
+    root.classList.remove("upgrad-carousel-root");
+    track.classList.remove("upgrad-carousel-track");
+
+    root.classList.add(ROOT_CLASS);
+    root.classList.toggle(
+      CONNECT_AC_ROOT_CLASS,
+      buttonState.hasConnectToAcButton
+    );
+    track.classList.add(TRACK_CLASS);
+
+    cards.forEach(function (card) {
+      card.classList.remove("upgrad-carousel-card");
+      card.classList.add(CARD_CLASS);
+
+      card.querySelectorAll("img").forEach(function (image) {
+        image.setAttribute("draggable", "false");
+      });
+    });
+
+    getOrCreateProgress(root);
+    bindTrack(root, track);
+    updateCarouselProgress(root, track);
+  }
+
+  function processAllCarousels() {
+    processingScheduled = false;
+
+    document
+      .querySelectorAll(TRACK_SELECTOR)
+      .forEach(formatCarousel);
+  }
+
+  function scheduleCarouselProcessing() {
+    if (processingScheduled) return;
+
+    processingScheduled = true;
+    window.requestAnimationFrame(processAllCarousels);
+  }
+
+  const observer = new MutationObserver(function (mutations) {
+    const hasCarouselChanges = mutations.some(
+      function (mutation) {
+        return Array.from(mutation.addedNodes).some(
+          function (node) {
+            if (node.nodeType !== Node.ELEMENT_NODE) {
+              return false;
+            }
+
+            return Boolean(
+              node.matches?.(
+                TRACK_SELECTOR +
+                ", " +
+                CARD_SELECTOR +
+                ", " +
+                ACTION_SELECTOR
+              ) ||
+              node.querySelector?.(
+                TRACK_SELECTOR +
+                ", " +
+                CARD_SELECTOR +
+                ", " +
+                ACTION_SELECTOR
+              ) ||
+              node.closest?.(TRACK_SELECTOR)
+            );
+          }
+        );
+      }
+    );
+
+    if (hasCarouselChanges) {
+      scheduleCarouselProcessing();
+    }
+  });
+
+  function initializeCarouselIntegration() {
+    processAllCarousels();
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    window.addEventListener(
+      "resize",
+      scheduleCarouselProcessing,
+      { passive: true }
+    );
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initializeCarouselIntegration,
+      { once: true }
+    );
+  } else {
+    initializeCarouselIntegration();
+  }
+})();
+
+/* ~ UPGRAD TARGETED CAROUSEL INTEGRATION */
