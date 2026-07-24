@@ -4100,3 +4100,180 @@ img.upgrad-launcher-image {
   margin-top: 0 !important;
   align-self: center !important;
 }
+/* =====================================================
+   SMO BUTTONS — ROUNDED RECTANGLE, NO BORDER
+   ===================================================== */
+
+#engtWrapper .upgrad-smo-grid > .upgrad-smo-button,
+#engt-popup .upgrad-smo-grid > .upgrad-smo-button {
+  min-height: 46px !important;
+  height: auto !important;
+
+  padding: 10px 16px !important;
+
+  /* Rounded rectangle, not capsule */
+  border-radius: 14px !important;
+
+  border: none !important;
+  outline: none !important;
+
+  background: #ffffff !important;
+  color: #1f1f1f !important;
+
+  box-shadow:
+    0 2px 7px rgba(0, 0, 0, 0.12) !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+
+  text-align: left !important;
+  box-sizing: border-box !important;
+
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease !important;
+}
+
+/* Subtle hover effect */
+#engtWrapper .upgrad-smo-grid > .upgrad-smo-button:hover,
+#engt-popup .upgrad-smo-grid > .upgrad-smo-button:hover {
+  transform: translateY(-1px) !important;
+
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.16) !important;
+}
+
+/* Remove movement while clicking */
+#engtWrapper .upgrad-smo-grid > .upgrad-smo-button:active,
+#engt-popup .upgrad-smo-grid > .upgrad-smo-button:active {
+  transform: translateY(0) !important;
+}
+
+/* Keyboard focus without adding a normal border */
+#engtWrapper .upgrad-smo-grid > .upgrad-smo-button:focus-visible,
+#engt-popup .upgrad-smo-grid > .upgrad-smo-button:focus-visible {
+  box-shadow:
+    0 0 0 2px rgba(0, 0, 0, 0.18),
+    0 3px 9px rgba(0, 0, 0, 0.14) !important;
+}
+
+/* =====================================================
+   SPACE BETWEEN CHAT MESSAGE BLOCKS
+   ===================================================== */
+
+#engtWrapper .engt-msg-container,
+#engt-popup .engt-msg-container {
+  margin-bottom: 18px !important;
+}
+
+/* Avoid unnecessary space after the latest message */
+#engtWrapper .engt-msg-container:last-child,
+#engt-popup .engt-msg-container:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* =====================================================
+   FINAL SMO GRID ALIGNMENT
+   Align with prompt bubble and prevent clipping
+   ===================================================== */
+
+.engt-msg-container.upgrad-smo-host
+.engt-msg-smo.upgrad-smo-processed
+.upgrad-smo-shell
+.upgrad-smo-grid.upgrad-smo-layout-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  column-gap: 12px !important;
+  row-gap: 12px !important;
+
+  transform: none !important;
+  box-sizing: border-box !important;
+}
+
+/* Keep both columns inside the available width */
+.engt-msg-container.upgrad-smo-host
+.upgrad-smo-grid.upgrad-smo-layout-grid
+> button.upgrad-smo-button {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Wrap longer labels instead of increasing button width */
+.engt-msg-container.upgrad-smo-host
+.upgrad-smo-grid.upgrad-smo-layout-grid
+.upgrad-smo-label {
+  min-width: 0 !important;
+  max-width: 100% !important;
+
+  white-space: normal !important;
+  overflow-wrap: break-word !important;
+}
+/* =====================================================
+   SAFE HEADER CORNER FIX
+   Does not affect messages, input, or launcher
+   ===================================================== */
+
+/* Clip only the outer chatbot panel */
+#engtWrapper {
+  border-radius: 26px 26px 0 0 !important;
+  overflow: hidden !important;
+}
+
+/* Remove spacing around the black header */
+#engtWrapper .engt-header,
+#engtWrapper .engt-common-header,
+#engtWrapper .engt-chat-header {
+  width: 100% !important;
+  margin: 0 !important;
+  border: 0 !important;
+
+  background: #000000 !important;
+  border-radius: 26px 26px 0 0 !important;
+
+  box-sizing: border-box !important;
+}
+
+/* Keep all internal chatbot containers unchanged */
+#engtWrapper .engt-chat-screen,
+#engtWrapper .engt-chat-window,
+#engtWrapper .engt-pages,
+#engtWrapper .engt-chat-container {
+  background: initial !important;
+  border-radius: 0 !important;
+}
+/* =====================================================
+   ALIGN FIRST CAROUSEL CARD WITH BOT MESSAGE BUBBLE
+   ===================================================== */
+
+.upgrad-download-brochure-carousel-root
+.upgrad-download-brochure-carousel-track {
+  margin-left: 0 !important;
+
+  /* top right bottom left */
+  padding: 0 16px 14px 0 !important;
+
+  /* start end */
+  scroll-padding-inline: 0 16px !important;
+}
+
+/* Mobile */
+@media only screen and (max-width: 600px) {
+  .upgrad-download-brochure-carousel-root
+  .upgrad-download-brochure-carousel-track {
+    padding: 0 10px 12px 0 !important;
+    scroll-padding-inline: 0 10px !important;
+  }
+}
