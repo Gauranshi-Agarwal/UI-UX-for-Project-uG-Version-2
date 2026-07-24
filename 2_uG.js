@@ -102,8 +102,8 @@
     "use strict";
     const CONFIG = {
         launcherImageUrl: "https://fpu.branding-element.com/prod/88870/INLINE_IMAGE/147645_15072026_073714_Screenshot_2026_07_15_at_1.07.03_PM.png-0atgo.png",
-        calloutHeading: "Chat with us.",
-        calloutText: "Get Instant Help!",
+        calloutHeading: "Chat with us",
+        calloutText: "   Get Instant Help!",
         /* Show callout after 2 seconds */
         calloutDelayMs: 2000,
         /* First automatic opening after 30 seconds */
